@@ -10,24 +10,6 @@
                 "seatac",
                 "kent"
             ]
-        },
-        {
-            "county": "snohomish",
-            "city": [
-                "everett",
-                "monroe",
-                "lynnwood",
-                "mountlake terrace",
-                "snohomish",
-                "edmonds"
-            ]
-        },
-        {
-            "county": "pierce",
-            "city": [
-                "tacoma",
-                "puyallup"
-            ]
         }
     ],
     "votes": {

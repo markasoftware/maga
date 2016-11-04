@@ -1,6 +1,11 @@
 var webpage = require('webpage');
 var fs = require('fs');
+var system = require('system');
 var config = JSON.parse(fs.read('./config.json'));
+var isDebug = system.args[1];
+if(isDebug) {
+    console.log('running in debug mode');
+}
 
 var page = webpage.create();
 page.viewportSize = {
@@ -13,7 +18,6 @@ var chosenLocationIndex = Math.floor(Math.random() * config.locations.length);
 var chosenCounty = config.locations[chosenLocationIndex].county;
 var possibleCities = config.locations[chosenLocationIndex].city;
 var chosenCity = possibleCities[Math.floor(Math.random() * possibleCities.length)];
-console.log('Using county ' + chosenCounty + ' and city ' + chosenCity);
 
 function waitUntilExists(selector, cb) {
     function waiting() {
@@ -28,6 +32,11 @@ function waitUntilExists(selector, cb) {
     }
     waiting();
 }
+
+var failTimeout = setTimeout(function() {
+    console.log('TIMEOUT');
+    phantom.exit();
+}, 15000);
 
 page.open('https://www.sos.wa.gov/elections/mock-election/#/vote/county', function(status) {
     if(status !== 'success') {
@@ -48,7 +57,6 @@ page.open('https://www.sos.wa.gov/elections/mock-election/#/vote/county', functi
             event.initEvent('change', true, true);
             selector.dispatchEvent(event);
         }, chosenCounty);
-        console.log('found county successfully');
         page.evaluate(function() {
             document.querySelector("a[href='#/vote/register']").click();
         });
@@ -79,7 +87,6 @@ page.open('https://www.sos.wa.gov/elections/mock-election/#/vote/county', functi
                 cityS.dispatchEvent(event);
             }, chosenCity);
             waitUntilExists('#school option:nth-child(2)', function() {
-                console.log('school list loaded');
                 page.evaluate(function() {
                     var schoolS = document.querySelector('#school');
                     var okSchools = [];
@@ -100,7 +107,10 @@ page.open('https://www.sos.wa.gov/elections/mock-election/#/vote/county', functi
                     page.evaluate(function() {
                         document.querySelector('a[ng-click="getBallot()"]').click();
                     });
-                    waitUntilExists('div[ng-repeat="b in ballot"]', part2);
+                    console.log('before part 2');
+                    waitUntilExists('div[ng-repeat="b in ballot"]', function() {
+                        setTimeout(part2, 3000);
+                    });
                 });
             });
         });
@@ -109,7 +119,6 @@ page.open('https://www.sos.wa.gov/elections/mock-election/#/vote/county', functi
 
 // i just want to split it up for cleaner looking code
 function part2() {
-    console.log('ballot page loaded');
     page.evaluate(function(votes) {
         var voteTitles = Object.keys(votes);
         var ballotThingies = document.querySelectorAll('div[ng-repeat="b in ballot"]');
@@ -121,6 +130,10 @@ function part2() {
             })[0];
             var cToVote = votes[cVoteTitle];
             var radioLabels = cb.querySelectorAll('label');
+            if(Math.random() < 0.15) {
+                radioLabels[Math.floor(Math.random() * radioLabels.length)].click();
+                continue;
+            }
             [].forEach.call(radioLabels, function(c) {
                 if(c.textContent.toLowerCase().indexOf(cToVote) !== -1) {
                     c.click();
@@ -129,14 +142,13 @@ function part2() {
         }
         document.querySelector('button[type=submit]').click();
     }, toVote);
-    var failTimeout = setTimeout(function() {
-        console.log('ERROR: success page did not load in time');
-        page.render('fail.jpg');
-        phantom.exit();
-    }, 15000);
+    if(isDebug) {
+        page.render('ballot-page.jpg');
+    }
+    console.log('before final thingy');
     waitUntilExists('.ng-hide > h3.text-center', function() {
-        console.log('done!');
-        page.render('boop.jpg');
+        clearTimeout(failTimeout);
+        console.log('DONE with county ' + chosenCounty + ' and city ' + chosenCity);
         phantom.exit();
     });
 }
