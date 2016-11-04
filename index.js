@@ -142,9 +142,9 @@ function part2() {
         page.render('ballot-page.jpg');
     }
     console.log('before final thingy');
-    waitUntilExists('.ng-hide > h3.text-center', function() {
+    setTimeout(function(){
         clearTimeout(failTimeout);
         console.log('DONE with county ' + chosenCounty + ' and city ' + chosenCity);
         phantom.exit();
-    });
+    }, 1500);
 }
