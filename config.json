@@ -1,0 +1,42 @@
+{
+    "locations": [
+        {
+            "county": "king",
+            "city": [
+                "seattle",
+                "shoreline",
+                "redmond",
+                "kirkland",
+                "seatac",
+                "kent"
+            ]
+        },
+        {
+            "county": "snohomish",
+            "city": [
+                "everett",
+                "monroe",
+                "lynnwood",
+                "mountlake terrace",
+                "snohomish",
+                "edmonds"
+            ]
+        },
+        {
+            "county": "pierce",
+            "city": [
+                "tacoma",
+                "puyallup"
+            ]
+        }
+    ],
+    "votes": {
+        "1433": "no",
+        "1491": "no",
+        "735": "no",
+        "president": "trump",
+        "senator": "vance",
+        "governor": "bryant",
+        "amendment": "no"
+    }
+}

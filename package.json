@@ -1,0 +1,21 @@
+{
+  "name": "maga",
+  "version": "0.0.0",
+  "description": "Make America Great Again",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/markasoftware/maga.git"
+  },
+  "scripts": {
+      "start": "phantomjs index.js"
+  },
+  "author": "markasoftware",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/markasoftware/maga/issues"
+  },
+  "homepage": "https://github.com/markasoftware/maga#readme",
+  "dependencies": {
+      "phantomjs-prebuilt": "*"
+  }
+}
