@@ -1,16 +1,32 @@
 {
     "locations": [
         {
-            "county": "king",
+            "county": "snohomish",
             "city": [
-                "seattle",
-                "shoreline",
-                "redmond",
-                "kirkland",
-                "seatac",
-                "kent"
+                "everett",
+                "edmonds",
+                "lynnwood",
+                "snohomish"
+            ]
+        },
+        {
+            "county": "pierce",
+            "city": [
+                "tacoma",
+                "roy",
+                "fife",
+                "dupont"
+            ]
+        },
+        {
+            "county": "grant",
+            "city": [
+                "george",
+                "moses lake",
+                "coulee city"
             ]
         }
+
     ],
     "votes": {
         "1433": "no",

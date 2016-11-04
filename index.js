@@ -36,13 +36,14 @@ function waitUntilExists(selector, cb) {
 var failTimeout = setTimeout(function() {
     console.log('TIMEOUT');
     phantom.exit();
-}, 15000);
+}, 10000);
 
 page.open('https://www.sos.wa.gov/elections/mock-election/#/vote/county', function(status) {
     if(status !== 'success') {
         console.log('ERROR: status not successful');
         phantom.exit();
     }
+    console.log('page loaded');
     waitUntilExists('#county > option:nth-child(2)', function() {
         // find and select the correct county
         page.evaluate(function(findMe) {
@@ -63,46 +64,44 @@ page.open('https://www.sos.wa.gov/elections/mock-election/#/vote/county', functi
         waitUntilExists('#school', function() {
 
             // select grade and city
-            page.evaluate(function(cityToUse) {
-                // generate and select grade
-                var gradeToUse = Math.floor(Math.random() * 4 + 9);
+            var wasOk = page.evaluate(function(cityToUse) {
                 var gradeS = document.querySelector('#grade');
                 var cityS = document.querySelector('#city');
                 // select grade
-                for(var i = 0; i < gradeS.options.length; ++i) {
-                    if(gradeS.options[i].textContent.indexOf(gradeToUse) !== -1) {
-                        gradeS.selectedIndex = i;
+                gradeS.selectedIndex = Math.floor(Math.random() * gradeS.options.length);
+                var clicked = false;
+                for(var k = 0; k < cityS.options.length; ++k) {
+                    if(cityS.options[k].textContent.toLowerCase() .indexOf(cityToUse) !== -1) {
+                        cityS.selectedIndex = k;
+                        clicked = true;
                         break;
                     }
                 }
-                for(var k = 0; k < cityS.options.length; ++k) {
-                    if(cityS.options[k].textContent.toLowerCase() === cityToUse) {
-                        cityS.selectedIndex = k;
-                        break;
-                    }
+                if(!clicked) {
+                    return false;
                 }
                 var event = document.createEvent('UIEvent');
                 event.initEvent('change', true, true);
                 gradeS.dispatchEvent(event);
                 cityS.dispatchEvent(event);
+                return true;
             }, chosenCity);
+            if(!wasOk) {
+                console.log('ERROR: City not found?', chosenCity);
+                phantom.exit();
+            }
+            console.log('school not loaded yet...');
             waitUntilExists('#school option:nth-child(2)', function() {
+                console.log('stuff but school clicked');
                 page.evaluate(function() {
                     var schoolS = document.querySelector('#school');
-                    var okSchools = [];
-                    var curText;
-                    for(var i = 0; i < schoolS.options.length; ++i) {
-                        curText = schoolS.options[i].textContent.toLowerCase();
-                        if(curText.indexOf('high') !== -1 && curText.indexOf('junior') === -1) {
-                            okSchools.push(i);
-                        }
-                    }
-                    schoolS.selectedIndex = okSchools[Math.floor(Math.random() * okSchools.length)];
+                    schoolS.selectedIndex = Math.floor(Math.random() * schoolS.options.length);
                     var event = document.createEvent('UIEvent');
                     event.initEvent('change', true, true);
                     schoolS.dispatchEvent(event);
                     document.querySelector('button[type=submit]').click();
                 });
+                console.log('stuff really clicked');
                 waitUntilExists('a[ng-click="getBallot()"]', function() {
                     page.evaluate(function() {
                         document.querySelector('a[ng-click="getBallot()"]').click();
@@ -144,6 +143,9 @@ function part2() {
     console.log('before final thingy');
     setTimeout(function(){
         clearTimeout(failTimeout);
+        if(isDebug) {
+            page.render('boop.jpg');
+        }
         console.log('DONE with county ' + chosenCounty + ' and city ' + chosenCity);
         phantom.exit();
     }, 1500);
