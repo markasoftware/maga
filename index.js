@@ -130,10 +130,6 @@ function part2() {
             })[0];
             var cToVote = votes[cVoteTitle];
             var radioLabels = cb.querySelectorAll('label');
-            if(Math.random() < 0.15) {
-                radioLabels[Math.floor(Math.random() * radioLabels.length)].click();
-                continue;
-            }
             [].forEach.call(radioLabels, function(c) {
                 if(c.textContent.toLowerCase().indexOf(cToVote) !== -1) {
                     c.click();
